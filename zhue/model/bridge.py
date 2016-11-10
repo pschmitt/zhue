@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 
 from __future__ import unicode_literals
+from simplejson.decoder import JSONDecodeError
 import config
 import light
 import logging
 import requests
 import sensor
+import hueobject
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -45,12 +47,17 @@ class Bridge(object):
         res = requests.request(url=url, method=method, json=data)
         if not res.ok:
             res.raise_for_status()
-        jr = res.json()
-        logger.debug(jr)
-        if type(jr) is list and len(jr) > 0 and 'error' in jr[0]:
-            logger.error(jr[0])
-            raise HueError(jr[0]['error']['description'])
-        return jr
+        try:
+            jr = res.json()
+            logger.debug('JSON Response: {}'.format(jr))
+            api_response = hueobject.HueApiResponse.factory(jr)
+            if type(api_response) is hueobject.HueErrorResponse:
+                raise HueError(api_response.description)
+            return api_response
+        except JSONDecodeError:
+            logger.error(
+                'Failed to decode JSON from response: {}'.format(res.text)
+            )
 
     @staticmethod
     def from_url(url):
@@ -79,7 +86,6 @@ class Bridge(object):
 
         hue_bridges = []
         res = scan()
-        print(res)
 
         for h in res:
             logger.info('Check {}'.format(h))
@@ -87,7 +93,6 @@ class Bridge(object):
             if device_info:
                 manufacturer = device_info.get('manufacturer', None)
                 model = device_info.get('modelNumber', None)
-                print(manufacturer, model)
                 if manufacturer == PHILIPS and model in BRIDGE_MODELS:
                     url = h.description['URLBase']
                     if url not in hue_bridges:
@@ -111,8 +116,7 @@ class Bridge(object):
     def _property(self, prop_url):
         url = '{}/{}'.format(self.API, prop_url)
         res = self._request(url)
-        logger.debug(res)
-        return res
+        return res._json
 
     @property
     def config(self):
@@ -161,25 +165,25 @@ class Bridge(object):
         raise HueError('No matching sensor was found')
 
     # Hue object discovery
-    def __find_new(self, hueobject):
+    def __find_new(self, hueobjecttype):
         '''
         Starts a search for new Hue objects
         '''
-        assert hueobject in ['lights', 'sensors'], \
-            'Unsupported object type {}'.format(hueobject)
-        url = '{}/{}'.format(self.API, hueobject)
+        assert hueobjecttype in ['lights', 'sensors'], \
+            'Unsupported object type {}'.format(hueobjecttype)
+        url = '{}/{}'.format(self.API, hueobjecttype)
         return self._request(
             method='POST',
             url=url
         )
 
-    def __get_new(self, hueobject):
+    def __get_new(self, hueobjecttype):
         '''
         Get a list of newly found Hue object
         '''
-        assert hueobject in ['lights', 'sensors'], \
-            'Unsupported object type {}'.format(hueobject)
-        url = '{}/{}/new'.format(self.API, hueobject)
+        assert hueobjecttype in ['lights', 'sensors'], \
+            'Unsupported object type {}'.format(hueobjecttype)
+        url = '{}/{}/new'.format(self.API, hueobjecttype)
         return self._request(url=url)
 
     def find_new_lights(self):
