@@ -7,7 +7,7 @@ import light
 import logging
 import requests
 import sensor
-import hueobject
+import api_response
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -50,10 +50,10 @@ class Bridge(object):
         try:
             jr = res.json()
             logger.debug('JSON Response: {}'.format(jr))
-            api_response = hueobject.HueApiResponse.factory(jr)
-            if type(api_response) is hueobject.HueErrorResponse:
-                raise HueError(api_response.description)
-            return api_response
+            response = api_response.HueApiResponse.factory(jr)
+            if type(response) is api_response.HueErrorResponse:
+                raise HueError(response.description)
+            return response
         except JSONDecodeError:
             logger.error(
                 'Failed to decode JSON from response: {}'.format(res.text)
