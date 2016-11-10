@@ -3,7 +3,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='zhue',
-    version='0.2.1',
+    version='0.2.2',
     license='GPL3',
     description='Python SDK for Philips Hue devices',
     long_description=open('README.rst').read(),
