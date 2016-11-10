@@ -45,7 +45,7 @@ class LightState(hueobject.HueObject):
         return self._json['colormode']
 
     @property
-    def ct(self):
+    def color_temperature(self):
         return self._json['ct']
 
     @property
