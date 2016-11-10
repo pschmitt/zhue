@@ -60,25 +60,25 @@ class Bridge(object):
             )
 
     @staticmethod
-    def from_url(url):
+    def from_url(url, username=None):
         from urlparse import urlparse
         res = urlparse(url)
-        return Bridge(hostname=res.hostname, port=res.port)
+        return Bridge(hostname=res.hostname, port=res.port, username=username)
 
     @staticmethod
-    def discover(guess=True):
-        nupnp = Bridge.discover_nupnp()
-        upnp = Bridge.discover_upnp()
+    def discover(guess=True, username=None):
+        nupnp = Bridge.discover_nupnp(username=username)
+        upnp = Bridge.discover_upnp(username=username)
         bridges = list(set(upnp + nupnp))
         return bridges[0] if guess and len(bridges) > 0 else bridges
 
     @staticmethod
-    def discover_nupnp():
+    def discover_nupnp(username=None):
         r = requests.get('https://www.meethue.com/api/nupnp')
-        return [Bridge(x['internalipaddress']) for x in r.json()]
+        return [Bridge(x['internalipaddress'], username) for x in r.json()]
 
     @staticmethod
-    def discover_upnp():
+    def discover_upnp(username=None):
         from netdisco.ssdp import scan
 
         PHILIPS = 'Royal Philips Electronics'
@@ -99,7 +99,7 @@ class Bridge(object):
                         hue_bridges.append(url)
             else:
                 logger.error('NO DEVICE INFO')
-        return [Bridge.from_url(x) for x in hue_bridges]
+        return [Bridge.from_url(x, username) for x in hue_bridges]
 
     def create_user(self, devicetype='zhue.py#user'):
         url = 'http://{}:{}/api'.format(self.hostname, self.port)
