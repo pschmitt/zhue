@@ -26,6 +26,11 @@ class Light(hueobject.HueDevice):
     def delete(self):
         return self._request(method='DELETE')
 
+    def alert(self, effect='select'):
+        assert effect in ['select', 'lselect', 'none'], \
+            'Unknown alert effect: {}'.format(effect)
+        return self._set_state(data={'alert': effect})
+
 
 class LightState(hueobject.HueObject):
     @property
