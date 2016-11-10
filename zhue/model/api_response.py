@@ -15,6 +15,12 @@ class HueApiResponse(object):
                 return HueSuccessResponse(json[0]['success'])
         return HueApiResponse(json)
 
+    def __repr__(self):
+        return self.__str__()
+
+    def __str__(self):
+        return '{}: {}'.format(type(self).__name__, self._json)
+
 
 class HueErrorResponse(HueApiResponse):
     @property
@@ -34,6 +40,7 @@ class HueErrorResponse(HueApiResponse):
 
     def __str__(self):
         return '{}: {}'.format(type(self).__name__, self.description)
+
 
 class HueSuccessResponse(HueApiResponse):
     pass
