@@ -122,7 +122,7 @@ class Bridge(object):
 
     @property
     def config(self):
-        return config.Config(self, self._property('config'))
+        return config.Config(self._property('config'))
 
     @property
     def lights(self):
