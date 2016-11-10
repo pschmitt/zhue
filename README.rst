@@ -4,7 +4,7 @@ zhue
 This library eases the interaction with Philips Hue devices
 
 .. code-block::
-    
+
     from zhue import Bridge
 
     # upnp/nupnp discovery
