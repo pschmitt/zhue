@@ -30,7 +30,7 @@ This library eases the interaction with Philips Hue devices
     [x.temperature for x in b.temperature_sensors]
 
     # get light level readings
-    [x.lightlevel for x in b.lightlevel_sensors]
+    [x.light_level for x in b.light_level_sensors]
 
     # get battery levels
     [x.config.battery for x in b.sensors if hasattr('battery', x.config)]
