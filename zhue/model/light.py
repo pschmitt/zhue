@@ -8,13 +8,7 @@ class Light(hueobject.HueDevice):
 
     def __on_off(self, state):
         assert state in ['on', 'off'], 'Unknown state: {}'.format(state)
-        url = '{}/state'.format(self.API)
-        data = {'on': state == 'on'}
-        return self._request(
-            method='PUT',
-            url=url,
-            data=data
-        )
+        return self._set_state(data={'on': state == 'on'})
 
     def on(self):
         return self.__on_off('on')

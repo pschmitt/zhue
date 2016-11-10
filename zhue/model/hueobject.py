@@ -25,6 +25,25 @@ class HueDevice(HueObject):
             return self._bridge._request(url=self.API, *args, **kwargs)
         return self._bridge._request(*args, **kwargs)
 
+    def _set_state(self, data):
+        url = '{}/state'.format(self.API)
+        res = self._request(
+            method='PUT',
+            url=url,
+            data=data
+        )
+        self.update()
+        return res
+
+    def update(self):
+        '''
+        Update our object's data
+        '''
+        self._json = self._request(
+            method='GET',
+            url=self.API
+        )._json
+
     @property
     def manufacturer(self):
         return self._json['manufacturername']
@@ -39,14 +58,11 @@ class HueDevice(HueObject):
 
     @name.setter
     def name(self, value):
-        res = self._request(
+        self._request(
             method='PUT',
             data={'name': value}
         )
-        if type(res) is list and len(res) > 0 and 'success' in res[0]:
-            self._json['name'] = res[0]['success']['/{}/{}/name'.format(
-                self.api_endpoint, self.hue_id
-            )]
+        self.update()
 
     @property
     def version(self):
