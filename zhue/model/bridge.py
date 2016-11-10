@@ -104,7 +104,9 @@ class Bridge(object):
     def create_user(self, devicetype='zhue.py#user'):
         url = 'http://{}:{}/api'.format(self.hostname, self.port)
         data = {'devicetype': devicetype}
-        return self._request(method='POST', url=url, data=data)
+        res = self._request(method='POST', url=url, data=data)
+        self.username = res._json['username']
+        return res
 
     def delete_user(self, username):
         url = '{}/config/whitelist/{}'.format(self.API, username)
