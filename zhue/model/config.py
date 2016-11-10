@@ -35,7 +35,7 @@ class Config(hueobject.HueObject):
 
     @property
     def zigbeechannel(self):
-        return self._json['zigbeechanel']
+        return self._json['zigbeechannel']
 
     @property
     def factorynew(self):
