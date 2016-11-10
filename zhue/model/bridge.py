@@ -138,13 +138,16 @@ class Bridge(object):
             s.append(sensor.factory(self, i, v))
         return s
 
-    @property
-    def temperature_sensors(self):
-        return [x for x in self.sensors if isinstance(x, sensor.TemperatureSensor)]
+    def __get_sensors_by_type(self, sensor_type):
+        return [x for x in self.sensors if isinstance(x, sensor_type)]
 
     @property
-    def lightlevel_sensors(self):
-        return [x for x in self.sensors if isinstance(x, sensor.LightLevelSensor)]
+    def temperature_sensors(self):
+        return self.__get_sensors_by_type(sensor.TemperatureSensor)
+
+    @property
+    def light_level_sensors(self):
+        return self.__get_sensors_by_type(sensor.LightLevelSensor)
 
     def light(self, name, exact=False):
         for l in self.lights:
