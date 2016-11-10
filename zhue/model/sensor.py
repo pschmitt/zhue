@@ -19,11 +19,23 @@ class Sensor(hueobject.HueDevice):
 
     @property
     def config(self):
-        return self._json['config']
+        return SensorConfig(self._json['config'])
+
+    @property
+    def state(self):
+        return SensorState(self._json['state'])
 
 
 class SensorConfig(hueobject.HueObject):
-    pass
+    @property
+    def battery(self):
+        return self._json['battery']
+
+
+class SensorState(hueobject.HueObject):
+    @property
+    def last_updated(self):
+        return self._json['lastupdated']
 
 
 class LightLevelSensor(Sensor):
@@ -31,15 +43,19 @@ class LightLevelSensor(Sensor):
     def config(self):
         return LightLevelSensorConfig(self._json['config'])
 
+    @property
+    def state(self):
+        return LightLevelSensorState(self._json['state'])
+
+    @property
+    def light_level(self):
+        return self.state.light_level
+
 
 class LightLevelSensorConfig(SensorConfig):
     @property
     def alert(self):
         return self._json['alert']
-
-    @property
-    def battery(self):
-        return self._json['battery']
 
     @property
     def ledindication(self):
@@ -62,6 +78,20 @@ class LightLevelSensorConfig(SensorConfig):
         return self._json['usertest']
 
 
+class LightLevelSensorState(SensorState):
+    @property
+    def light_level(self):
+        return self._json['lightlevel']
+
+    @property
+    def dark(self):
+        return self._json['dark']
+
+    @property
+    def daylight(self):
+        return self._json['daylight']
+
+
 class TemperatureSensor(Sensor):
     @property
     def config(self):
@@ -71,19 +101,19 @@ class TemperatureSensor(Sensor):
     def state(self):
         return TemperatureSensorState(self._json['state'])
 
+    @property
+    def temperature(self):
+        return self.state.temperature
+
 
 class TemperatureSensorConfig(LightLevelSensorConfig):
     pass
 
 
-class TemperatureSensorState(hueobject.HueObject):
+class TemperatureSensorState(SensorState):
     @property
     def temperature(self):
         return float(self._json['temperature'] / 100.0)
-
-    @property
-    def lastupdated(self):
-        return self._json['lastupdated']
 
 
 class SwitchSensor(Sensor):
@@ -93,9 +123,6 @@ class SwitchSensor(Sensor):
 
 
 class SwitchSensorConfig(SensorConfig):
-    @property
-    def battery(self):
-        return self._json['battery']
 
     @property
     def on(self):
