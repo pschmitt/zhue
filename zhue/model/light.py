@@ -20,4 +20,4 @@ class Light(hueobject.HueDevice):
         return self.state['on']
 
     def delete(self):
-        return self._bridge._request(method='DELETE')
+        return self._request(method='DELETE')
