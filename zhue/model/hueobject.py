@@ -10,10 +10,9 @@ class HueApiResponse(object):
     def factory(json):
         if type(json) is list and len(json) > 0:
             if 'error' in json[0]:
-                print('ERROR: {}'.format(json[0]['error']))
                 return HueErrorResponse(json[0]['error'])
             elif 'success' in json[0]:
-                return HueSuccessResponse(json)
+                return HueSuccessResponse(json[0]['success'])
         return HueApiResponse(json)
 
 
