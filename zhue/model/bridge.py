@@ -10,7 +10,6 @@ import sensor
 import api_response
 
 
-logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
