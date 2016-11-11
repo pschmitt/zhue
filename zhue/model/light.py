@@ -34,6 +34,9 @@ class Light(hueobject.HueDevice):
             'Unknown alert effect: {}'.format(effect)
         return self._set_state(data={'alert': effect})
 
+    def alert_stop(self):
+        return self.alert('none')
+
 
 class LightState(hueobject.HueObject):
     @property
