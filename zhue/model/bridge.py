@@ -149,25 +149,33 @@ class Bridge(object):
     def light_level_sensors(self):
         return self.__get_sensors_by_type(sensor.LightLevelSensor)
 
-    def light(self, name, exact=False):
-        for l in self.lights:
-            if exact:
-                if l.name == name:
-                    return l
-            else:
-                if l.name.lower().startswith(name.lower()):
-                    return l
-        raise HueError('No matching light was found')
+    def __get_devices_by_type(self, device_type):
+        if device_type == 'sensor':
+            return self.sensors
+        elif device_type == 'light':
+            return self.lights
+        else:
+            logger.error('Unknown device type')
 
-    def sensor(self, name, exact=False):
-        for s in self.sensors:
-            if exact:
-                if s.name == name:
-                    return s
-            else:
-                if s.name.lower().startswith(name.lower()):
-                    return s
-        raise HueError('No matching sensor was found')
+    def __get_device(self, device_type, name=None, hue_id=None, exact=False):
+        assert name or hue_id, 'Name or Hue ID must be provided'
+        for d in self.__get_devices_by_type(device_type):
+            if name:
+                if exact:
+                    if d.name == name:
+                        return d
+                else:
+                    if d.name.lower().startswith(name.lower()):
+                        return d
+            elif str(d.hue_id) == str(hue_id):
+                return d
+        raise HueError('No matching device was found')
+
+    def light(self, name=None, hue_id=None, exact=False):
+        return self.__get_device('light', name, hue_id, exact)
+
+    def sensor(self, name=None, hue_id=None, exact=False):
+        return self.__get_device('sensor', name, hue_id, exact)
 
     # Hue object discovery
     def __find_new(self, hueobjecttype):
