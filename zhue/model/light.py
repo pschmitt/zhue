@@ -20,6 +20,9 @@ class Light(hueobject.HueDevice):
     def off(self):
         return self.__on_off('off')
 
+    def toggle(self):
+        return self.off() if self.is_on() else self.on()
+
     def is_on(self):
         return self.state.on
 
