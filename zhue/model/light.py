@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 import hueobject
 
 
-class Light(hueobject.HueDevice):
+class Light(hueobject.HueLLDevice):
     def __init__(self, *args, **kwargs):
         super(Light, self).__init__('lights', *args, **kwargs)
 

@@ -16,7 +16,7 @@ def factory(bridge, hue_id, json):
         return Sensor(bridge, hue_id, json)
 
 
-class Sensor(hueobject.HueDevice):
+class Sensor(hueobject.HueLLDevice):
     def __init__(self, *args, **kwargs):
         super(Sensor, self).__init__('sensors', *args, **kwargs)
 
@@ -35,26 +35,6 @@ class Sensor(hueobject.HueDevice):
     @property
     def has_battery(self):
         return self.battery is not None
-
-    def __decompose_uuid(self):
-        # FIXME Not all sensor types have an UUID
-        m = re.match(
-            r'(([0-9a-f]{2}[:-]){7}([0-9a-f]{2}))-([0-9a-f]{2}-[0-9a-f]{4})',
-            self.uuid
-        )
-        if m:
-            return m.group(1), m.group(4)
-        return None, None
-
-    @property
-    def mac_address(self):
-        mac, _ = self.__decompose_uuid()
-        return mac
-
-    @property
-    def device_id(self):
-        _, dev_id = self.__decompose_uuid()
-        return dev_id
 
 
 class SensorConfig(hueobject.HueObject):

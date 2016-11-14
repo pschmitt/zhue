@@ -1,5 +1,11 @@
 from __future__ import unicode_literals
 from __future__ import print_function
+import re
+
+
+uuid_mac_regex = re.compile(
+    r'(([0-9a-f]{2}[:-]){6}([0-9a-f]{2})):(.+)'
+)
 
 
 class HueObject(object):
@@ -7,9 +13,9 @@ class HueObject(object):
         self._json = json
 
 
-class HueDevice(HueObject):
+class HueLLDevice(HueObject):
     def __init__(self, api_endpoint, bridge, hue_id, *args, **kwargs):
-        super(HueDevice, self).__init__(*args, **kwargs)
+        super(HueLLDevice, self).__init__(*args, **kwargs)
         self.hue_id = hue_id
         self._bridge = bridge
         self.api_endpoint = api_endpoint
@@ -71,6 +77,23 @@ class HueDevice(HueObject):
     @property
     def uuid(self):
         return self._json.get('uniqueid', None)
+
+    def __decompose_uuid(self):
+        if self.uuid:
+            m = re.match(uuid_mac_regex, self.uuid)
+            if m:
+                return m.group(1), m.group(4)
+        return None, None
+
+    @property
+    def mac_address(self):
+        mac, _ = self.__decompose_uuid()
+        return mac
+
+    @property
+    def device_id(self):
+        _, dev_id = self.__decompose_uuid()
+        return dev_id
 
     @property
     def type(self):

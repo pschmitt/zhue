@@ -2,12 +2,13 @@
 
 from __future__ import unicode_literals
 from simplejson.decoder import JSONDecodeError
+import api_response
 import config
+import device
 import light
 import logging
 import requests
 import sensor
-import api_response
 
 
 logger = logging.getLogger(__name__)
@@ -136,6 +137,29 @@ class Bridge(object):
         for i, v in self._property('sensors').iteritems():
             s.append(sensor.factory(self, i, v))
         return s
+
+    def __regroup_sensors(self):
+        d = {}
+        for s in self.sensors:
+            mac_addr = None
+            try:
+                mac_addr = s.mac_address
+            except:
+                pass
+            if mac_addr in d:
+                d[mac_addr].append(s)
+            else:
+                d[mac_addr] = [s]
+        return d
+
+    @property
+    def devices(self):
+        devs = []
+        sensors_grouped = self.__regroup_sensors()
+        for d in filter(None, sensors_grouped):
+            devs.append(device.HueDevice.factory(sensors_grouped[d]))
+        devs += self.lights
+        return devs
 
     def __get_sensors_by_type(self, sensor_type):
         return [x for x in self.sensors if isinstance(x, sensor_type)]
