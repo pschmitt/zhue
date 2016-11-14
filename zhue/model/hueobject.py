@@ -70,7 +70,7 @@ class HueDevice(HueObject):
 
     @property
     def uuid(self):
-        return self._json['uniqueid']
+        return self._json.get('uniqueid', None)
 
     @property
     def type(self):
