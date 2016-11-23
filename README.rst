@@ -23,6 +23,12 @@ This library eases the interaction with Philips Hue devices
     b.light('outdoor').on()
     b.light('outdoor').off()
 
+    # query groups
+    b.groups
+
+    # turn all lights belonging to a group on
+    b.group('living').on()
+
     # query sensors
     b.sensors
 

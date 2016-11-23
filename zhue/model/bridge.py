@@ -5,6 +5,7 @@ from simplejson.decoder import JSONDecodeError
 import api_response
 import config
 import device
+import group
 import light
 import logging
 import requests
@@ -132,6 +133,13 @@ class Bridge(object):
         return l
 
     @property
+    def groups(self):
+        l = []
+        for i, v in self._property('groups').iteritems():
+            l.append(group.Group(self, i, v))
+        return l
+
+    @property
     def sensors(self):
         s = []
         for i, v in self._property('sensors').iteritems():
@@ -177,6 +185,8 @@ class Bridge(object):
             return self.sensors
         elif device_type == 'light':
             return self.lights
+        elif device_type == 'group':
+            return self.groups
         else:
             logger.error('Unknown device type')
 
@@ -193,6 +203,9 @@ class Bridge(object):
             elif str(d.hue_id) == str(hue_id):
                 return d
         raise HueError('No matching device was found')
+
+    def group(self, name=None, hue_id=None, exact=False):
+        return self.__get_device('group', name, hue_id, exact)
 
     def light(self, name=None, hue_id=None, exact=False):
         return self.__get_device('light', name, hue_id, exact)

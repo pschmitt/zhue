@@ -112,3 +112,31 @@ class HueLLDevice(HueObject):
 
     def __str__(self):
         return '<{}: {}>'.format(type(self).__name__, self.name)
+
+
+class LightDevice(HueLLDevice):
+    def __on_off(self, state):
+        assert state in ['on', 'off'], 'Unknown state: {}'.format(state)
+        return self._set_state(data={'on': state == 'on'})
+
+    def on(self):
+        return self.__on_off('on')
+
+    def off(self):
+        return self.__on_off('off')
+
+    def toggle(self):
+        return self.off() if self.is_on() else self.on()
+
+    def delete(self):
+        return self._request(method='DELETE')
+
+    def alert(self, effect='select'):
+        assert effect in ['select', 'lselect', 'none'], \
+            'Unknown alert effect: {}'.format(effect)
+        return self._set_state(data={'alert': effect})
+
+    def alert_stop(self):
+        return self.alert('none')
+
+
