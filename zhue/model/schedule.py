@@ -6,4 +6,4 @@ import basemodel
 
 class Schedule(basemodel.HueLLDevice):
     def __init__(self, *args, **kwargs):
-        super(Schedule, self).__init__('groups', *args, **kwargs)
+        super(Schedule, self).__init__('schedule', *args, **kwargs)
