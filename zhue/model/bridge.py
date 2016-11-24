@@ -121,7 +121,7 @@ class Bridge(object):
                     if url not in hue_bridges:
                         hue_bridges.append(url)
             else:
-                logger.error('NO DEVICE INFO')
+                logger.error('Missing device info')
         return [Bridge.from_url(x, username) for x in hue_bridges]
 
     def create_user(self, devicetype='zhue.py#user'):
