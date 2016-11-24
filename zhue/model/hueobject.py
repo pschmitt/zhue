@@ -8,10 +8,13 @@ uuid_mac_regex = re.compile(
 )
 
 
-class HueObject(object):
+class HueJsonObject(object):
     def __init__(self, json):
         self._json = json
 
+
+class HueObject(HueJsonObject):
+    pass
 
 class HueLLDevice(HueObject):
     def __init__(self, api_endpoint, bridge, hue_id, *args, **kwargs):
@@ -23,6 +26,15 @@ class HueLLDevice(HueObject):
             self._bridge.API,
             self.api_endpoint,
             self.hue_id
+        )
+
+    @property
+    def address(self):
+        return self.API.replace(
+            'http://{}:{}'.format(
+                self._bridge.hostname,
+                self._bridge.port
+            ), ''
         )
 
     # Shortcut function
