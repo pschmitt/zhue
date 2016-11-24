@@ -85,9 +85,13 @@ class Bridge(object):
         return Bridge(hostname=res.hostname, port=res.port, username=username)
 
     @staticmethod
-    def discover(guess=True, username=None):
+    def discover(username=None, guess=True, fast=True):
         nupnp = Bridge.discover_nupnp(username=username)
-        upnp = Bridge.discover_upnp(username=username)
+        if not fast or not nupnp:
+            upnp = Bridge.discover_upnp(username=username)
+        else:
+            logger.info('Skip UPNP discovery')
+            upnp = []
         bridges = list(set(upnp + nupnp))
         return bridges[0] if guess and len(bridges) > 0 else bridges
 
