@@ -42,7 +42,7 @@ class Bridge(object):
             return self.group(hue_id=hue_id)
         elif endpoint == 'schedules':
             return self.schedule(hue_id=hue_id)
-        raise RuntimeError('Unsupported enpoint')
+        raise HueError('Unsupported enpoint')
 
     @property
     def username(self):
