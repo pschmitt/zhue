@@ -8,6 +8,7 @@ import device
 import group
 import light
 import logging
+import re
 import requests
 import schedule
 import sensor
@@ -15,6 +16,7 @@ import sensor
 
 logger = logging.getLogger(__name__)
 
+endpoint_regex = re.compile(r'/api/([^/]+)/([^/]+)/([^/]+)(?:/(.+))?')
 
 class HueError(Exception):
     pass
@@ -26,6 +28,21 @@ class Bridge(object):
         self.port = port
         self._username = username
         self.__contruct_api_url()
+
+    def from_address(self, address):
+        m = re.match(endpoint_regex, address)
+        assert m, 'Invalid address'
+        endpoint = m.group(2)
+        hue_id = m.group(3)
+        if endpoint == 'sensors':
+            return self.sensor(hue_id=hue_id)
+        elif endpoint == 'lamps':
+            return self.lamp(hue_id=hue_id)
+        elif endpoint == 'groups':
+            return self.group(hue_id=hue_id)
+        elif endpoint == 'schedules':
+            return self.schedule(hue_id=hue_id)
+        raise RuntimeError('Unsupported enpoint')
 
     @property
     def username(self):
