@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
-import hueobject
+import basemodel
 
 
-class Light(hueobject.LightDevice):
+class Light(basemodel.LightDevice):
     def __init__(self, *args, **kwargs):
         super(Light, self).__init__('lights', *args, **kwargs)
 
@@ -18,7 +18,7 @@ class Light(hueobject.LightDevice):
         return 'Light: {}{}'.format(self.name, ' (*)' if self.is_on else '')
 
 
-class LightState(hueobject.HueObject):
+class LightState(basemodel.HueObject):
     @property
     def alert(self):
         return self._json['alert']

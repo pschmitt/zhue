@@ -1,9 +1,9 @@
 from __future__ import unicode_literals
-import hueobject
+import basemodel
 import sensor
 
 
-class HueDevice(hueobject.HueLLDevice):
+class HueDevice(basemodel.HueLLDevice):
     @staticmethod
     def factory(devices):
         # If devices only holds a single sensor, use it

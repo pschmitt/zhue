@@ -1,9 +1,9 @@
 # coding: utf-8
 
 from __future__ import unicode_literals
-import hueobject
+import basemodel
 
 
-class Schedule(hueobject.HueLLDevice):
+class Schedule(basemodel.HueLLDevice):
     def __init__(self, *args, **kwargs):
         super(Schedule, self).__init__('groups', *args, **kwargs)

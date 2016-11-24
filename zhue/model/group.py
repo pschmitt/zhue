@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
-import hueobject
+import basemodel
 
 
-class Group(hueobject.LightDevice):
+class Group(basemodel.LightDevice):
     def __init__(self, *args, **kwargs):
         super(Group, self).__init__('groups', *args, **kwargs)
 
@@ -37,7 +37,7 @@ class Group(hueobject.LightDevice):
         return res
 
 
-class GroupState(hueobject.HueObject):
+class GroupState(basemodel.HueObject):
     @property
     def all_on(self):
         return self._json['all_on']

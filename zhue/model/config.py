@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
-import hueobject
+import basemodel
 
 
-class Config(hueobject.HueObject):
+class Config(basemodel.HueObject):
     # Versions
     @property
     def api_version(self):

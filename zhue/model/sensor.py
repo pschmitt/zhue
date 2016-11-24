@@ -1,5 +1,5 @@
 from __future__ import unicode_literals
-import hueobject
+import basemodel
 import re
 
 
@@ -16,7 +16,7 @@ def factory(bridge, hue_id, json):
         return Sensor(bridge, hue_id, json)
 
 
-class Sensor(hueobject.HueLLDevice):
+class Sensor(basemodel.HueLLDevice):
     def __init__(self, *args, **kwargs):
         super(Sensor, self).__init__('sensors', *args, **kwargs)
 
@@ -37,13 +37,13 @@ class Sensor(hueobject.HueLLDevice):
         return self.battery is not None
 
 
-class SensorConfig(hueobject.HueObject):
+class SensorConfig(basemodel.HueObject):
     @property
     def battery(self):
         return self._json.get('battery', None)
 
 
-class SensorState(hueobject.HueObject):
+class SensorState(basemodel.HueObject):
     @property
     def last_updated(self):
         return self._json['lastupdated']
