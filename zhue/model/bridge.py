@@ -9,6 +9,7 @@ import group
 import light
 import logging
 import requests
+import schedule
 import sensor
 
 
@@ -137,6 +138,13 @@ class Bridge(object):
         l = []
         for i, v in self._property('groups').iteritems():
             l.append(group.Group(self, i, v))
+        return l
+
+    @property
+    def schedules(self):
+        l = []
+        for i, v in self._property('schedules').iteritems():
+            l.append(schedule.Schedule(self, i, v))
         return l
 
     @property
