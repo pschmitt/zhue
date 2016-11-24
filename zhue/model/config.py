@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 import basemodel
 
 
-class Config(basemodel.HueObject):
+class Config(basemodel.HueJsonObject):
     # Versions
     @property
     def api_version(self):
