@@ -15,7 +15,7 @@ class Light(hueobject.LightDevice):
         return LightState(self._json['state'])
 
     def __str__(self):
-        return super(Light, self).__str__ + ' (*)' if self.is_on else ''
+        return 'Light: {}{}'.format(self.name, ' (*)' if self.is_on else '')
 
 
 class LightState(hueobject.HueObject):
