@@ -254,3 +254,10 @@ class Bridge(object):
 
     def new_sensors(self):
         return self.__get_new('sensors')
+
+    # All on/off
+    def all_off(self):
+        [l.off() for l in self.lights]
+
+    def all_on(self):
+        [l.on() for l in self.lights]
