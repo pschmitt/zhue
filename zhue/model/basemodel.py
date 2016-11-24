@@ -14,11 +14,8 @@ class HueJsonObject(object):
 
 
 class HueObject(HueJsonObject):
-    pass
-
-class HueLLDevice(HueObject):
     def __init__(self, api_endpoint, bridge, hue_id, *args, **kwargs):
-        super(HueLLDevice, self).__init__(*args, **kwargs)
+        super(HueObject, self).__init__(*args, **kwargs)
         self.hue_id = hue_id
         self._bridge = bridge
         self.api_endpoint = api_endpoint
@@ -30,6 +27,10 @@ class HueLLDevice(HueObject):
 
     @property
     def address(self):
+        '''
+        Return the address of this "object", minus the scheme, hostname
+        and port of the bridge
+        '''
         return self.API.replace(
             'http://{}:{}'.format(
                 self._bridge.hostname,
@@ -43,6 +44,18 @@ class HueLLDevice(HueObject):
             return self._bridge._request(url=self.API, *args, **kwargs)
         return self._bridge._request(*args, **kwargs)
 
+    def update(self):
+        '''
+        Update our object's data
+        '''
+        self._json = self._request(
+            method='GET',
+            url=self.API
+        )._json
+
+
+class HueLLDevice(HueObject):
+
     def _set_state(self, data):
         url = '{}/state'.format(self.API)
         res = self._request(
@@ -52,15 +65,6 @@ class HueLLDevice(HueObject):
         )
         self.update()
         return res
-
-    def update(self):
-        '''
-        Update our object's data
-        '''
-        self._json = self._request(
-            method='GET',
-            url=self.API
-        )._json
 
     @property
     def manufacturer(self):

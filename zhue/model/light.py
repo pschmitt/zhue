@@ -18,7 +18,7 @@ class Light(basemodel.LightDevice):
         return 'Light: {}{}'.format(self.name, ' (*)' if self.is_on else '')
 
 
-class LightState(basemodel.HueObject):
+class LightState(basemodel.HueJsonObject):
     @property
     def alert(self):
         return self._json['alert']

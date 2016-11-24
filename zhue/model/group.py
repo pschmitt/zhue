@@ -37,7 +37,7 @@ class Group(basemodel.LightDevice):
         return res
 
 
-class GroupState(basemodel.HueObject):
+class GroupState(basemodel.HueJsonObject):
     @property
     def all_on(self):
         return self._json['all_on']
