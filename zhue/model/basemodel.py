@@ -25,6 +25,12 @@ class HueObject(HueJsonObject):
             self.hue_id
         )
 
+    def delete(self):
+        return self._request(
+            method='DELETE',
+            url=self.API
+        )
+
     @property
     def address(self):
         '''
