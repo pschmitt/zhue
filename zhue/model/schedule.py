@@ -51,7 +51,7 @@ class Schedule(basemodel.HueLLDevice):
 
     @property
     def device(self):
-        return self._bridge.from_address(self.device_address)
+        return self._bridge.from_address(self.command.address)
 
     @property
     def status(self):
