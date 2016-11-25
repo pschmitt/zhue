@@ -1,12 +1,33 @@
 # coding: utf-8
 
 from __future__ import unicode_literals
+import api_response
 import basemodel
 
 
 class Schedule(basemodel.HueLLDevice):
     def __init__(self, *args, **kwargs):
-        super(Schedule, self).__init__('schedule', *args, **kwargs)
+        super(Schedule, self).__init__('schedules', *args, **kwargs)
+
+    @staticmethod
+    def new(bridge, command, localtime, status='enabled', name='',
+            description='', autodelete=True, recycle=True):
+        response = bridge._request(
+            url='{}/schedules'.format(bridge.API),
+            method='POST',
+            data={
+                'command': command,
+                'name': name,
+                'description': description,
+                'status': status,
+                'localtime': localtime,
+                # 'autodelete': autodelete,
+                'recycle': recycle
+            }
+        )
+        if type(response) is api_response.HueSuccessResponse:
+            return bridge.schedule(hue_id=response._json['id'])
+        return response
 
     @property
     def description(self):
