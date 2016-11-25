@@ -236,7 +236,7 @@ class Bridge(object):
                 else:
                     if re.match('.*{}.*'.format(name), d.name, re.IGNORECASE):
                         return d
-        raise HueError('No matching device was found')
+        raise HueError('No matching item was found')
 
     def group(self, name=None, hue_id=None, exact=False):
         return self.__get_device('group', name, hue_id, exact)
