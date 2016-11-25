@@ -232,7 +232,7 @@ class Bridge(object):
                     if d.name == name:
                         return d
                 else:
-                    if d.name.lower().startswith(name.lower()):
+                    if re.match('.*{}.*'.format(name), d.name, re.IGNORECASE):
                         return d
             elif str(d.hue_id) == str(hue_id):
                 return d
