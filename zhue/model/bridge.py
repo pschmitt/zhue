@@ -227,6 +227,8 @@ class Bridge(object):
     def __get_device(self, device_type, name=None, hue_id=None, exact=False):
         assert name or hue_id, 'Name or Hue ID must be provided'
         for d in self.__get_devices_by_type(device_type):
+            if hue_id and str(d.hue_id) == str(hue_id):
+                return d
             if name:
                 if exact:
                     if d.name == name:
@@ -234,8 +236,6 @@ class Bridge(object):
                 else:
                     if re.match('.*{}.*'.format(name), d.name, re.IGNORECASE):
                         return d
-            elif str(d.hue_id) == str(hue_id):
-                return d
         raise HueError('No matching device was found')
 
     def group(self, name=None, hue_id=None, exact=False):
