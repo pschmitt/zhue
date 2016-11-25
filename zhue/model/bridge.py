@@ -16,7 +16,9 @@ import sensor
 
 logger = logging.getLogger(__name__)
 
+
 endpoint_regex = re.compile(r'/api/([^/]+)/([^/]+)/([^/]+)(?:/(.+))?')
+
 
 class HueError(Exception):
     pass
@@ -64,6 +66,7 @@ class Bridge(object):
 
     def _request(self, url, method='GET', data=None):
         res = requests.request(url=url, method=method, json=data)
+        logging.debug('Request data: {}'.format(data))
         if not res.ok:
             res.raise_for_status()
         try:
@@ -216,6 +219,8 @@ class Bridge(object):
             return self.lights
         elif device_type == 'group':
             return self.groups
+        elif device_type == 'schedule':
+            return self.schedules
         else:
             logger.error('Unknown device type')
 
@@ -241,6 +246,9 @@ class Bridge(object):
 
     def sensor(self, name=None, hue_id=None, exact=False):
         return self.__get_device('sensor', name, hue_id, exact)
+
+    def schedule(self, name=None, hue_id=None, exact=False):
+        return self.__get_device('schedule', name, hue_id, exact)
 
     # Hue object discovery
     def __find_new(self, hueobjecttype):
@@ -282,3 +290,7 @@ class Bridge(object):
 
     def all_on(self):
         [l.on() for l in self.lights]
+
+    # Factory methods. Create new objects
+    def create_schedule(self, *args, **kwargs):
+        return schedule.Schedule.new(self, *args, **kwargs)
