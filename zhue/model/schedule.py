@@ -21,7 +21,7 @@ class Schedule(basemodel.HueLLDevice):
                 'description': description,
                 'status': status,
                 'localtime': localtime,
-                # 'autodelete': autodelete,
+                # 'autodelete': autodelete, # FIXME
                 'recycle': recycle
             }
         )
@@ -47,19 +47,7 @@ class Schedule(basemodel.HueLLDevice):
 
     @property
     def command(self):
-        return self._json['command']
-
-    @property
-    def method(self):
-        return self._json['command']['method']
-
-    @property
-    def body(self):
-        return self._json['command']['body']
-
-    @property
-    def device_address(self):
-        return self._json['command']['address']
+        return ScheduledCommand(self._json['command'])
 
     @property
     def device(self):
@@ -72,3 +60,21 @@ class Schedule(basemodel.HueLLDevice):
     @property
     def recycle(self):
         return self._json['recycle']
+
+
+class ScheduledCommand(basemodel.HueJsonObject):
+    @property
+    def method(self):
+        return self._json['method']
+
+    @property
+    def body(self):
+        return self._json['body']
+
+    @property
+    def address(self):
+        '''
+        Override the address property because if does not contain the
+        bridge hostname
+        '''
+        return self._json['address']
