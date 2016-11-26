@@ -311,10 +311,10 @@ class Bridge(object):
 
     # All on/off
     def all_off(self):
-        [l.off() for l in self.lights]
+        return group.MasterGroup(self).off()
 
     def all_on(self):
-        [l.on() for l in self.lights]
+        return group.MasterGroup(self).on()
 
     # Factory methods. Create new objects
     def create_schedule(self, *args, **kwargs):
