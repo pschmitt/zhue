@@ -11,4 +11,4 @@ class Light(basemodel.LightDevice):
         return basemodel.LightDeviceState(self._json['state'])
 
     def __str__(self):
-        return 'Light: {}{}'.format(self.name, ' (*)' if self.is_on else '')
+        return '<Light: {}{}>'.format(self.name, ' (*)' if self.is_on else '')
