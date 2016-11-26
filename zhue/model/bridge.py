@@ -10,6 +10,7 @@ import light
 import logging
 import re
 import requests
+import scene
 import schedule
 import sensor
 
@@ -178,6 +179,13 @@ class Bridge(object):
             s.append(sensor.factory(self, i, v))
         return s
 
+    @property
+    def scenes(self):
+        s = []
+        for i, v in self._property('scenes').iteritems():
+            s.append(scene.Scene(self, i, v))
+        return s
+
     def __regroup_sensors(self):
         d = {}
         for s in self.sensors:
@@ -221,6 +229,8 @@ class Bridge(object):
             return self.groups
         elif device_type == 'schedule':
             return self.schedules
+        elif device_type == 'scene':
+            return self.scenes
         else:
             logger.error('Unknown device type')
 
@@ -249,6 +259,9 @@ class Bridge(object):
 
     def schedule(self, name=None, hue_id=None, exact=False):
         return self.__get_device('schedule', name, hue_id, exact)
+
+    def scene(self, name=None, hue_id=None, exact=False):
+        return self.__get_device('scene', name, hue_id, exact)
 
     # Hue object discovery
     def __find_new(self, hueobjecttype):

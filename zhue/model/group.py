@@ -2,16 +2,9 @@ from __future__ import unicode_literals
 import basemodel
 
 
-class Group(basemodel.LightDevice):
+class Group(basemodel.BaseGroup):
     def __init__(self, *args, **kwargs):
         super(Group, self).__init__('groups', *args, **kwargs)
-
-    @property
-    def lights(self):
-        l = []
-        for l_id in self._json['lights']:
-            l.append(self._bridge.light(hue_id=l_id))
-        return l
 
     @property
     def state(self):

@@ -252,3 +252,11 @@ class LightDeviceState(HueJsonObject):
     def xy(self):
         return self._json['xy']
 
+
+class BaseGroup(LightDevice):
+    @property
+    def lights(self):
+        l = []
+        for l_id in self._json['lights']:
+            l.append(self._bridge.light(hue_id=l_id))
+        return l
