@@ -147,8 +147,12 @@ class LightDevice(HueLLDevice):
     def off(self):
         return self.__on_off('off')
 
+    @property
+    def is_on(self):
+        return self.state.on
+
     def toggle(self):
-        return self.off() if self.is_on() else self.on()
+        return self.off() if self.is_on else self.on()
 
     def delete(self):
         return self._request(method='DELETE')
@@ -161,4 +165,90 @@ class LightDevice(HueLLDevice):
     def alert_stop(self):
         return self.alert('none')
 
+    @property
+    def brightness(self):
+        return self.state.brightness
+
+    @brightness.setter
+    def brightness(self, value):
+        assert value in xrange(0, 256), 'Unsupported brigthness value'
+        return self._set_state(data={'bri': value})
+
+    @property
+    def saturation(self):
+        return self.state.saturation
+
+    @saturation.setter
+    def saturation(self, value):
+        assert value in xrange(0, 256), 'Unsupported saturation value'
+        return self._set_state(data={'sat': value})
+
+    @property
+    def hue(self):
+        return self.state.hue
+
+    @hue.setter
+    def hue(self, value):
+        assert value in xrange(0, 65536), 'Unsupported hue value'
+        return self._set_state(data={'hue': value})
+
+    @property
+    def xy(self):
+        return self.state.xy
+
+    @xy.setter
+    def xy(self, value):
+        assert type(value) is list, 'Unsupported xy value'
+        return self._set_state(data={'xy': value})
+
+    @property
+    def color_temperature(self):
+        return self.state.color_temperature
+
+    @color_temperature.setter
+    def color_temperature(self, value):
+        assert value in xrange(0, 65536), 'Unsupported color_temperature value'
+        return self._set_state(data={'ct': value})
+
+
+class LightDeviceState(HueJsonObject):
+    @property
+    def alert(self):
+        return self._json['alert']
+
+    @property
+    def on(self):
+        return self._json['on']
+
+    @property
+    def brightness(self):
+        return self._json['bri']
+
+    @property
+    def colormode(self):
+        return self._json['colormode']
+
+    @property
+    def color_temperature(self):
+        return self._json['ct']
+
+    @property
+    def effect(self):
+        return self._json['effect']
+
+    @property
+    def hue(self):
+        return self._json['hue']
+
+    @property
+    def reachable(self):
+        return self._json['reachable']
+
+    @property
+    def saturation(self):
+        return self._json['sat']
+
+    @property
+    def xy(self):
+        return self._json['xy']
 
