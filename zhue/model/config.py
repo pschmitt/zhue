@@ -1,8 +1,9 @@
 from __future__ import unicode_literals
 import basemodel
+import user
 
 
-class Config(basemodel.HueJsonObject):
+class BridgeConfig(basemodel.HueJsonObject):
     # Versions
     @property
     def api_version(self):
@@ -45,3 +46,9 @@ class Config(basemodel.HueJsonObject):
     def timezone(self):
         return self._json['timezone']
 
+    @property
+    def users(self):
+        u = []
+        for k, v in self._json['whitelist'].iteritems():
+            u.append(user.User(username=k, json=v))
+        return u

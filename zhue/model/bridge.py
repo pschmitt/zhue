@@ -149,7 +149,11 @@ class Bridge(object):
 
     @property
     def config(self):
-        return config.Config(self._property('config'))
+        return config.BridgeConfig(self._property('config'))
+
+    @property
+    def users(self):
+        return self.config.users
 
     @property
     def lights(self):
@@ -220,7 +224,7 @@ class Bridge(object):
     def light_level_sensors(self):
         return self.__get_sensors_by_type(sensor.LightLevelSensor)
 
-    def __get_devices_by_type(self, device_type):
+    def __get_hue_objects_by_type(self, device_type):
         if device_type == 'sensor':
             return self.sensors
         elif device_type == 'light':
@@ -231,12 +235,15 @@ class Bridge(object):
             return self.schedules
         elif device_type == 'scene':
             return self.scenes
+        elif device_type == 'user':
+            return self.users
         else:
             logger.error('Unknown device type')
 
-    def __get_device(self, device_type, name=None, hue_id=None, exact=False):
+    def __get_hue_object(self, device_type, name=None, hue_id=None,
+                         exact=False):
         assert name or hue_id, 'Name or Hue ID must be provided'
-        for d in self.__get_devices_by_type(device_type):
+        for d in self.__get_hue_objects_by_type(device_type):
             if hue_id and str(d.hue_id) == str(hue_id):
                 return d
             if name:
@@ -249,19 +256,22 @@ class Bridge(object):
         raise HueError('No matching item was found')
 
     def group(self, name=None, hue_id=None, exact=False):
-        return self.__get_device('group', name, hue_id, exact)
+        return self.__get_hue_object('group', name, hue_id, exact)
 
     def light(self, name=None, hue_id=None, exact=False):
-        return self.__get_device('light', name, hue_id, exact)
+        return self.__get_hue_object('light', name, hue_id, exact)
 
     def sensor(self, name=None, hue_id=None, exact=False):
-        return self.__get_device('sensor', name, hue_id, exact)
+        return self.__get_hue_object('sensor', name, hue_id, exact)
 
     def schedule(self, name=None, hue_id=None, exact=False):
-        return self.__get_device('schedule', name, hue_id, exact)
+        return self.__get_hue_object('schedule', name, hue_id, exact)
 
     def scene(self, name=None, hue_id=None, exact=False):
-        return self.__get_device('scene', name, hue_id, exact)
+        return self.__get_hue_object('scene', name, hue_id, exact)
+
+    def user(self, name=None, username=None, exact=False):
+        return self.__get_hue_object('user', name, username, exact)
 
     # Hue object discovery
     def __find_new(self, hueobjecttype):

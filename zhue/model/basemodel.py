@@ -13,6 +13,12 @@ class HueJsonObject(object):
         self._json = json
 
 
+class NamedHueJsonObject(HueJsonObject):
+    @property
+    def name(self):
+        return self._json['name']
+
+
 class HueObject(HueJsonObject):
     def __init__(self, api_endpoint, bridge, hue_id, *args, **kwargs):
         super(HueObject, self).__init__(*args, **kwargs)
