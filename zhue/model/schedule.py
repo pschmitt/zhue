@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 import api_response
 import basemodel
+import re
 
 
 class Schedule(basemodel.HueLLDevice):
@@ -12,15 +13,23 @@ class Schedule(basemodel.HueLLDevice):
     @staticmethod
     def new(bridge, command, localtime, status='enabled', name='',
             description='', autodelete=True, recycle=True):
+        if isinstance(command, ScheduledCommand):
+            cmd = command._json
+        else:
+            cmd = command
+        if isinstance(localtime, ScheduleTime):
+            ltime = localtime.timestr
+        else:
+            ltime = localtime
         response = bridge._request(
             url='{}/schedules'.format(bridge.API),
             method='POST',
             data={
-                'command': command,
+                'command': cmd,
                 'name': name,
                 'description': description,
                 'status': status,
-                'localtime': localtime,
+                'localtime': ltime,
                 # 'autodelete': autodelete, # FIXME
                 'recycle': recycle
             }
@@ -39,11 +48,11 @@ class Schedule(basemodel.HueLLDevice):
 
     @property
     def time(self):
-        return self._json['time']
+        return ScheduleTime(self._json['time'])
 
     @property
     def localtime(self):
-        return self._json['localtime']
+        return ScheduleTime(self._json['localtime'])
 
     @property
     def command(self):
@@ -60,6 +69,35 @@ class Schedule(basemodel.HueLLDevice):
     @property
     def recycle(self):
         return self._json['recycle']
+
+
+class ScheduleTime(object):
+    def __init__(self, timestr):
+        self.timestr = timestr
+
+    @property
+    def recurring(self):
+        return re.match(
+            r'W\d{3}/T\d{2}:\d{2}:\d{2}(A\d{2}:\d{2}\d{2})?',
+            self.timestr
+        ) is not None
+
+    # @property
+    # def randomized(self):
+    #     return re.match(
+    #         r'(W\d{3}/T)?\d{2}:\d{2}:\d{2}(A\d{2}:\d{2}\d{2})?',
+    #         self.timestr
+    #     ) is not None
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __str__(self):
+        return '<ScheduleTime: {}>'.format(self.timestr)
+
+
+class RecurringTime(ScheduleTime):
+    pass
 
 
 class ScheduledCommand(basemodel.HueJsonObject):
