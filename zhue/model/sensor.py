@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 import basemodel
-import re
 
 
 def factory(bridge, hue_id, json):
