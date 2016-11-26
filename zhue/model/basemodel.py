@@ -19,12 +19,36 @@ class NamedHueJsonObject(HueJsonObject):
         return self._json['name']
 
 
-class HueObject(HueJsonObject):
-    def __init__(self, api_endpoint, bridge, hue_id, *args, **kwargs):
-        super(HueObject, self).__init__(*args, **kwargs)
-        self.hue_id = hue_id
+class HueBaseObject(HueJsonObject):
+    def __init__(self, bridge, api_endpoint, json):
+        super(HueBaseObject, self).__init__(json)
         self._bridge = bridge
         self.api_endpoint = api_endpoint
+        self.API = '{}/{}'.format(
+            self._bridge.API,
+            self.api_endpoint
+        )
+
+    # Shortcut function
+    def _request(self, *args, **kwargs):
+        if 'url' not in kwargs:
+            return self._bridge._request(url=self.API, *args, **kwargs)
+        return self._bridge._request(*args, **kwargs)
+
+    def update(self):
+        '''
+        Update our object's data
+        '''
+        self._json = self._request(
+            method='GET',
+            url=self.API
+        )._json
+
+
+class HueObject(HueBaseObject):
+    def __init__(self, bridge, api_endpoint, hue_id, json):
+        super(HueObject, self).__init__(bridge, api_endpoint, json)
+        self.hue_id = hue_id
         self.API = '{}/{}/{}'.format(
             self._bridge.API,
             self.api_endpoint,
@@ -67,7 +91,6 @@ class HueObject(HueJsonObject):
 
 
 class HueLLDevice(HueObject):
-
     def _set_state(self, data):
         url = '{}/state'.format(self.API)
         res = self._request(

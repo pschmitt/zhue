@@ -17,8 +17,8 @@ def factory(bridge, hue_id, json):
 
 
 class Sensor(basemodel.HueLLDevice):
-    def __init__(self, *args, **kwargs):
-        super(Sensor, self).__init__('sensors', *args, **kwargs)
+    def __init__(self, bridge, hue_id, json):
+        super(Sensor, self).__init__(bridge, 'sensors', hue_id, json)
 
     @property
     def config(self):

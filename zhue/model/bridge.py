@@ -149,7 +149,7 @@ class Bridge(object):
 
     @property
     def config(self):
-        return config.BridgeConfig(self._property('config'))
+        return config.BridgeConfig(self, self._property('config'))
 
     @property
     def users(self):
@@ -319,3 +319,7 @@ class Bridge(object):
     # Factory methods. Create new objects
     def create_schedule(self, *args, **kwargs):
         return schedule.Schedule.new(self, *args, **kwargs)
+
+    # Software update
+    def update_check(self):
+        return

@@ -4,8 +4,8 @@ import group
 
 
 class Scene(basemodel.BaseGroup):
-    def __init__(self, *args, **kwargs):
-        super(Scene, self).__init__('scenes', *args, **kwargs)
+    def __init__(self, bridge, hue_id, json):
+        super(Scene, self).__init__(bridge, 'scenes', hue_id, json)
 
     @property
     def owner(self):

@@ -3,7 +3,10 @@ import basemodel
 import user
 
 
-class BridgeConfig(basemodel.HueJsonObject):
+class BridgeConfig(basemodel.HueBaseObject):
+    def __init__(self, bridge, json):
+        super(BridgeConfig, self).__init__(bridge, 'config', json)
+
     # Versions
     @property
     def api_version(self):
@@ -47,8 +50,21 @@ class BridgeConfig(basemodel.HueJsonObject):
         return self._json['timezone']
 
     @property
+    def localtime(self):
+        return self._json['localtime']
+
+    @property
+    def utc(self):
+        return self._json['UTC']
+
+    @property
     def users(self):
         u = []
         for k, v in self._json['whitelist'].iteritems():
             u.append(user.User(username=k, json=v))
         return u
+
+    def update_check(self):
+        res = self._request(data={"swupdate": {"checkforupdate":True}})
+        self.update()
+        return res

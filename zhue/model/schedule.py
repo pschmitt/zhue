@@ -7,8 +7,8 @@ import re
 
 
 class Schedule(basemodel.HueLLDevice):
-    def __init__(self, *args, **kwargs):
-        super(Schedule, self).__init__('schedules', *args, **kwargs)
+    def __init__(self, bridge, hue_id, json):
+        super(Schedule, self).__init__(bridge, 'schedules', hue_id, json)
 
     @staticmethod
     def new(bridge, command, localtime, status='enabled', name='',

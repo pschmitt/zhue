@@ -3,8 +3,8 @@ import basemodel
 
 
 class Group(basemodel.BaseGroup):
-    def __init__(self, *args, **kwargs):
-        super(Group, self).__init__('groups', *args, **kwargs)
+    def __init__(self, bridge, hue_id, json):
+        super(Group, self).__init__(bridge, 'groups', hue_id, json)
 
     @property
     def name(self):
