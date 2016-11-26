@@ -55,3 +55,7 @@ class GroupState(basemodel.LightDeviceState):
 class MasterGroup(Group):
     def __init__(self, bridge):
         super(MasterGroup, self).__init__(bridge=bridge, hue_id=0, json=None)
+
+    @property
+    def lights(self):
+        return self._bridge.ligths
