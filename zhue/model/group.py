@@ -7,6 +7,13 @@ class Group(basemodel.BaseGroup):
         super(Group, self).__init__('groups', *args, **kwargs)
 
     @property
+    def name(self):
+        if self._json:
+            return super(Group, self).name
+        elif self.hue_id == 0:
+            return '# Master group'
+
+    @property
     def state(self):
         return GroupState(
             dict(self._json['state'].items() + self._json['action'].items())
@@ -31,6 +38,9 @@ class Group(basemodel.BaseGroup):
         self.update()
         return res
 
+    def set_scene(self, scene):
+        return self._set_state({'scene': scene.hue_id})
+
 
 class GroupState(basemodel.LightDeviceState):
     @property
@@ -40,3 +50,8 @@ class GroupState(basemodel.LightDeviceState):
     @property
     def any_on(self):
         return self._json['any_on']
+
+
+class MasterGroup(Group):
+    def __init__(self, bridge):
+        super(MasterGroup, self).__init__(bridge=bridge, hue_id=0, json=None)

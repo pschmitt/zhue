@@ -256,6 +256,8 @@ class Bridge(object):
         raise HueError('No matching item was found')
 
     def group(self, name=None, hue_id=None, exact=False):
+        if hue_id == 0:
+            return group.MasterGroup(self)
         return self.__get_hue_object('group', name, hue_id, exact)
 
     def light(self, name=None, hue_id=None, exact=False):

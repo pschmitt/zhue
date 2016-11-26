@@ -131,9 +131,9 @@ class HueLLDevice(HueObject):
     def state(self):
         return self._json['state']
 
-    @property
-    def config(self):
-        return self._json['config']
+    # @property
+    # def config(self):
+    #     return self._json['config']
 
     def __repr__(self):
         return self.__str__()
