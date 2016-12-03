@@ -224,6 +224,10 @@ class Bridge(object):
     def light_level_sensors(self):
         return self.__get_sensors_by_type(sensor.LightLevelSensor)
 
+    @property
+    def presence_sensors(self):
+        return self.__get_sensors_by_type(sensor.PresenceSensor)
+
     def __get_hue_objects_by_type(self, device_type):
         if device_type == 'sensor':
             return self.sensors
