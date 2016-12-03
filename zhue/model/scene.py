@@ -1,9 +1,12 @@
+# coding: utf-8
+
+from __future__ import absolute_import
 from __future__ import unicode_literals
-import basemodel
-import group
+from .basemodel import (BaseGroup)
+from .group import (Group, MasterGroup)
 
 
-class Scene(basemodel.BaseGroup):
+class Scene(BaseGroup):
     def __init__(self, bridge, hue_id, json):
         super(Scene, self).__init__(bridge, 'scenes', hue_id, json)
 
@@ -37,9 +40,9 @@ class Scene(basemodel.BaseGroup):
 
     def recall(self, target_group=None):
         if target_group is None:
-            target_grp = group.MasterGroup(self._bridge)
+            target_grp = MasterGroup(self._bridge)
         else:
             target_grp = target_group
-        assert isinstance(target_grp, group.Group), \
+        assert isinstance(target_grp, Group), \
             'Provided object is not a group'
         return target_grp.set_scene(self)

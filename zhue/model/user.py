@@ -1,8 +1,9 @@
+from __future__ import absolute_import
 from __future__ import unicode_literals
-import basemodel
+from .basemodel import NamedHueJsonObject
 
 
-class User(basemodel.NamedHueJsonObject):
+class User(NamedHueJsonObject):
     def __init__(self, username, *args, **kwargs):
         super(User, self).__init__(*args, **kwargs)
         self.username = username
