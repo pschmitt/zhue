@@ -42,7 +42,7 @@ class SensorConfig(basemodel.HueObject):
         return self._json.get('battery', None)
 
 
-class SensorState(basemodel.HueObject):
+class SensorState(basemodel.HueJsonObject):
     @property
     def last_updated(self):
         return self._json['lastupdated']
