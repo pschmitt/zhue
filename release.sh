@@ -20,6 +20,7 @@ then
     exit 2
 fi
 
+git add setup.py
 git commit -m "version $version"
 git tag -a "$version" -m "zhue $version"
 git push --follow-tags
