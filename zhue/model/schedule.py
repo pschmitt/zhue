@@ -55,6 +55,16 @@ class Schedule(HueLLDevice):
     def localtime(self):
         return ScheduleTime(self._json['localtime'])
 
+    @localtime.setter
+    def localtime(self, value):
+        if isinstance(value, ScheduleTime):
+            val = value.timestr
+        else:
+            val = value
+        self._request(method='PUT', data={'localtime': val})
+        self.update()
+        # self._json['localtime'] = val
+
     @property
     def command(self):
         return ScheduledCommand(self._json['command'])
