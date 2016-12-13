@@ -240,6 +240,8 @@ class Bridge(object):
             return self.scenes
         elif device_type == 'user':
             return self.users
+        elif device_type == 'device':
+            return self.devices
         else:
             logger.error('Unknown device type')
 
@@ -277,6 +279,9 @@ class Bridge(object):
 
     def user(self, name=None, username=None, exact=False):
         return self.__get_hue_object('user', name, username, exact)
+
+    def device(self, name=None, hue_id=None, exact=False):
+        return self.__get_hue_object('device', name, hue_id, exact)
 
     # Hue object discovery
     def __find_new(self, hueobjecttype):
