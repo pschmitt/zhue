@@ -7,10 +7,11 @@ from simplejson.decoder import JSONDecodeError
 from .api_response import (HueApiResponse, HueErrorResponse)
 from .config import BridgeConfig
 from .device import HueDevice
-from .light import Light
 from .group import (Group, MasterGroup)
-from .schedule import Schedule
+from .light import Light
+from .rule import Rule
 from .scene import Scene
+from .schedule import Schedule
 from .sensor import (LightLevelSensor, TemperatureSensor)
 from .sensor import factory as sensorfactory
 import logging
@@ -131,13 +132,6 @@ class Bridge(object):
                 logger.error('Missing device info')
         return [Bridge.from_url(x, username) for x in hue_bridges]
 
-    def create_user(self, devicetype='zhue.py#user'):
-        url = 'http://{}:{}/api'.format(self.hostname, self.port)
-        data = {'devicetype': devicetype}
-        res = self._request(method='POST', url=url, data=data)
-        self.username = res._json['username']
-        return res
-
     def delete_user(self, username):
         url = '{}/config/whitelist/{}'.format(self.API, username)
         return self._request(method='DELETE', url=url)
@@ -193,6 +187,23 @@ class Bridge(object):
             s.append(Scene(self, i, v))
         return s
 
+    @property
+    def devices(self):
+        devs = []
+        sensors_grouped = self.__regroup_sensors()
+        for d in filter(None, sensors_grouped):
+            devs.append(HueDevice.factory(sensors_grouped[d]))
+        devs += self.lights
+        return devs
+
+    @property
+    def rules(self):
+        r = []
+        for i, v in self._property('scenes').items():
+            r.append(Rule(self, i, v))
+        return r
+
+
     def __regroup_sensors(self):
         d = {}
         for s in self.sensors:
@@ -206,15 +217,6 @@ class Bridge(object):
             else:
                 d[mac_addr] = [s]
         return d
-
-    @property
-    def devices(self):
-        devs = []
-        sensors_grouped = self.__regroup_sensors()
-        for d in filter(None, sensors_grouped):
-            devs.append(HueDevice.factory(sensors_grouped[d]))
-        devs += self.lights
-        return devs
 
     def __get_sensors_by_type(self, sensor_type):
         return [x for x in self.sensors if isinstance(x, sensor_type)]
@@ -329,8 +331,18 @@ class Bridge(object):
         return MasterGroup(self).on()
 
     # Factory methods. Create new objects
+    def create_user(self, devicetype='zhue.py#user'):
+        url = 'http://{}:{}/api'.format(self.hostname, self.port)
+        data = {'devicetype': devicetype}
+        res = self._request(method='POST', url=url, data=data)
+        self.username = res._json['username']
+        return res
+
     def create_schedule(self, *args, **kwargs):
         return Schedule.new(self, *args, **kwargs)
+
+    def create_rule(self, *args, **kwargs):
+        return Rule.new(self, *args, **kwargs)
 
     # Software update
     def update_check(self):
