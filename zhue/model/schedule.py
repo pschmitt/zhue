@@ -1,12 +1,13 @@
 # coding: utf-8
 
+from __future__ import absolute_import
 from __future__ import unicode_literals
-import api_response
-import basemodel
+from .basemodel import (HueLLDevice, HueJsonObject)
+from .api_response import HueSuccessResponse
 import re
 
 
-class Schedule(basemodel.HueLLDevice):
+class Schedule(HueLLDevice):
     def __init__(self, bridge, hue_id, json):
         super(Schedule, self).__init__(bridge, 'schedules', hue_id, json)
 
@@ -34,7 +35,7 @@ class Schedule(basemodel.HueLLDevice):
                 'recycle': recycle
             }
         )
-        if type(response) is api_response.HueSuccessResponse:
+        if type(response) is HueSuccessResponse:
             return bridge.schedule(hue_id=response._json['id'])
         return response
 
@@ -53,6 +54,16 @@ class Schedule(basemodel.HueLLDevice):
     @property
     def localtime(self):
         return ScheduleTime(self._json['localtime'])
+
+    @localtime.setter
+    def localtime(self, value):
+        if isinstance(value, ScheduleTime):
+            val = value.timestr
+        else:
+            val = value
+        self._request(method='PUT', data={'localtime': val})
+        self.update()
+        # self._json['localtime'] = val
 
     @property
     def command(self):
@@ -100,7 +111,7 @@ class RecurringTime(ScheduleTime):
     pass
 
 
-class ScheduledCommand(basemodel.HueJsonObject):
+class ScheduledCommand(HueJsonObject):
     @property
     def method(self):
         return self._json['method']

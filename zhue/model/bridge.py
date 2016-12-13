@@ -1,18 +1,21 @@
 #!/usr/bin/env python
+# coding: utf-8
 
+from __future__ import absolute_import
 from __future__ import unicode_literals
 from simplejson.decoder import JSONDecodeError
-import api_response
-import config
-import device
-import group
-import light
+from .api_response import (HueApiResponse, HueErrorResponse)
+from .config import BridgeConfig
+from .device import HueDevice
+from .light import Light
+from .group import (Group, MasterGroup)
+from .schedule import Schedule
+from .scene import Scene
+from .sensor import (LightLevelSensor, TemperatureSensor)
+from .sensor import factory as sensorfactory
 import logging
 import re
 import requests
-import scene
-import schedule
-import sensor
 
 
 logger = logging.getLogger(__name__)
@@ -73,8 +76,8 @@ class Bridge(object):
         try:
             jr = res.json()
             logger.debug('JSON Response: {}'.format(jr))
-            response = api_response.HueApiResponse.factory(jr)
-            if type(response) is api_response.HueErrorResponse:
+            response = HueApiResponse.factory(jr)
+            if type(response) is HueErrorResponse:
                 raise HueError(response.description)
             return response
         except JSONDecodeError:
@@ -149,7 +152,7 @@ class Bridge(object):
 
     @property
     def config(self):
-        return config.BridgeConfig(self, self._property('config'))
+        return BridgeConfig(self, self._property('config'))
 
     @property
     def users(self):
@@ -158,36 +161,36 @@ class Bridge(object):
     @property
     def lights(self):
         l = []
-        for i, v in self._property('lights').iteritems():
-            l.append(light.Light(self, i, v))
+        for i, v in self._property('lights').items():
+            l.append(Light(self, i, v))
         return l
 
     @property
     def groups(self):
         l = []
-        for i, v in self._property('groups').iteritems():
-            l.append(group.Group(self, i, v))
+        for i, v in self._property('groups').items():
+            l.append(Group(self, i, v))
         return l
 
     @property
     def schedules(self):
         l = []
-        for i, v in self._property('schedules').iteritems():
-            l.append(schedule.Schedule(self, i, v))
+        for i, v in self._property('schedules').items():
+            l.append(Schedule(self, i, v))
         return l
 
     @property
     def sensors(self):
         s = []
-        for i, v in self._property('sensors').iteritems():
-            s.append(sensor.factory(self, i, v))
+        for i, v in self._property('sensors').items():
+            s.append(sensorfactory(self, i, v))
         return s
 
     @property
     def scenes(self):
         s = []
-        for i, v in self._property('scenes').iteritems():
-            s.append(scene.Scene(self, i, v))
+        for i, v in self._property('scenes').items():
+            s.append(Scene(self, i, v))
         return s
 
     def __regroup_sensors(self):
@@ -209,7 +212,7 @@ class Bridge(object):
         devs = []
         sensors_grouped = self.__regroup_sensors()
         for d in filter(None, sensors_grouped):
-            devs.append(device.HueDevice.factory(sensors_grouped[d]))
+            devs.append(HueDevice.factory(sensors_grouped[d]))
         devs += self.lights
         return devs
 
@@ -218,11 +221,11 @@ class Bridge(object):
 
     @property
     def temperature_sensors(self):
-        return self.__get_sensors_by_type(sensor.TemperatureSensor)
+        return self.__get_sensors_by_type(TemperatureSensor)
 
     @property
     def light_level_sensors(self):
-        return self.__get_sensors_by_type(sensor.LightLevelSensor)
+        return self.__get_sensors_by_type(LightLevelSensor)
 
     @property
     def presence_sensors(self):
@@ -241,6 +244,8 @@ class Bridge(object):
             return self.scenes
         elif device_type == 'user':
             return self.users
+        elif device_type == 'device':
+            return self.devices
         else:
             logger.error('Unknown device type')
 
@@ -261,7 +266,7 @@ class Bridge(object):
 
     def group(self, name=None, hue_id=None, exact=False):
         if hue_id == 0:
-            return group.MasterGroup(self)
+            return MasterGroup(self)
         return self.__get_hue_object('group', name, hue_id, exact)
 
     def light(self, name=None, hue_id=None, exact=False):
@@ -278,6 +283,9 @@ class Bridge(object):
 
     def user(self, name=None, username=None, exact=False):
         return self.__get_hue_object('user', name, username, exact)
+
+    def device(self, name=None, hue_id=None, exact=False):
+        return self.__get_hue_object('device', name, hue_id, exact)
 
     # Hue object discovery
     def __find_new(self, hueobjecttype):
@@ -315,14 +323,14 @@ class Bridge(object):
 
     # All on/off
     def all_off(self):
-        return group.MasterGroup(self).off()
+        return MasterGroup(self).off()
 
     def all_on(self):
-        return group.MasterGroup(self).on()
+        return MasterGroup(self).on()
 
     # Factory methods. Create new objects
     def create_schedule(self, *args, **kwargs):
-        return schedule.Schedule.new(self, *args, **kwargs)
+        return Schedule.new(self, *args, **kwargs)
 
     # Software update
     def update_check(self):

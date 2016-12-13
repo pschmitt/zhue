@@ -1,5 +1,6 @@
+from __future__ import absolute_import
 from __future__ import unicode_literals
-import basemodel
+from .basemodel import (HueObject, HueLLDevice, HueJsonObject)
 
 
 def factory(bridge, hue_id, json):
@@ -15,7 +16,7 @@ def factory(bridge, hue_id, json):
         return Sensor(bridge, hue_id, json)
 
 
-class Sensor(basemodel.HueLLDevice):
+class Sensor(HueLLDevice):
     def __init__(self, bridge, hue_id, json):
         super(Sensor, self).__init__(bridge, 'sensors', hue_id, json)
 
@@ -36,13 +37,13 @@ class Sensor(basemodel.HueLLDevice):
         return self.battery is not None
 
 
-class SensorConfig(basemodel.HueObject):
+class SensorConfig(HueObject):
     @property
     def battery(self):
         return self._json.get('battery', None)
 
 
-class SensorState(basemodel.HueJsonObject):
+class SensorState(HueJsonObject):
     @property
     def last_updated(self):
         return self._json['lastupdated']

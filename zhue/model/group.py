@@ -1,8 +1,9 @@
+from __future__ import absolute_import
 from __future__ import unicode_literals
-import basemodel
+from .basemodel import (BaseGroup, LightDeviceState)
 
 
-class Group(basemodel.BaseGroup):
+class Group(BaseGroup):
     def __init__(self, bridge, hue_id, json):
         super(Group, self).__init__(bridge, 'groups', hue_id, json)
 
@@ -42,7 +43,7 @@ class Group(basemodel.BaseGroup):
         return self._set_state({'scene': scene.hue_id})
 
 
-class GroupState(basemodel.LightDeviceState):
+class GroupState(LightDeviceState):
     @property
     def all_on(self):
         return self._json['all_on']

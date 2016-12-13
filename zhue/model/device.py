@@ -1,9 +1,10 @@
+from __future__ import absolute_import
 from __future__ import unicode_literals
-import basemodel
-import sensor
+from .sensor import (PresenceSensor, TemperatureSensor, LightLevelSensor)
+from .basemodel import HueLLDevice
 
 
-class HueDevice(basemodel.HueLLDevice):
+class HueDevice(HueLLDevice):
     @staticmethod
     def factory(devices):
         # If devices only holds a single sensor, use it
@@ -13,11 +14,11 @@ class HueDevice(basemodel.HueLLDevice):
         temp_sensor = False
         light_sensor = False
         for d in devices:
-            if isinstance(d, sensor.PresenceSensor):
+            if isinstance(d, PresenceSensor):
                 presence_sensor = True
-            elif isinstance(d, sensor.TemperatureSensor):
+            elif isinstance(d, TemperatureSensor):
                 temp_sensor = True
-            elif isinstance(d, sensor.LightLevelSensor):
+            elif isinstance(d, LightLevelSensor):
                 light_sensor = True
         if presence_sensor and temp_sensor and light_sensor:
             return HueMotionDetectorDevice(devices)
@@ -41,15 +42,15 @@ class HueMultiSensorDevice(HueDevice):
 class HueMotionDetectorDevice(HueMultiSensorDevice):
     @property
     def presence_sensor(self):
-        return self._get_sensor_by_type(sensor.PresenceSensor)
+        return self._get_sensor_by_type(PresenceSensor)
 
     @property
     def temperature_sensor(self):
-        return self._get_sensor_by_type(sensor.TemperatureSensor)
+        return self._get_sensor_by_type(TemperatureSensor)
 
     @property
     def light_level_sensor(self):
-        return self._get_sensor_by_type(sensor.LightLevelSensor)
+        return self._get_sensor_by_type(LightLevelSensor)
 
     @property
     def name(self):

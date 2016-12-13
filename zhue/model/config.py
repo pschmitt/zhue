@@ -1,9 +1,10 @@
+from __future__ import absolute_import
 from __future__ import unicode_literals
-import basemodel
-import user
+from .basemodel import HueBaseObject
+from .user import User
 
 
-class BridgeConfig(basemodel.HueBaseObject):
+class BridgeConfig(HueBaseObject):
     def __init__(self, bridge, json):
         super(BridgeConfig, self).__init__(bridge, 'config', json)
 
@@ -61,7 +62,7 @@ class BridgeConfig(basemodel.HueBaseObject):
     def users(self):
         u = []
         for k, v in self._json['whitelist'].iteritems():
-            u.append(user.User(username=k, json=v))
+            u.append(User(username=k, json=v))
         return u
 
     def update_check(self):

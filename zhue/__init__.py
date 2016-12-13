@@ -1,3 +1,2 @@
-from model.bridge import Bridge
-# from model.light import Light
-# from model.sensor.sensor import Sensor
+from __future__ import absolute_import
+from .model.bridge import Bridge
