@@ -88,6 +88,15 @@ class ScheduleTime(object):
 
     @property
     def recurring(self):
+        '''
+        # Mo Tu We Th Fr Sa Su
+        # 64 32 16  8  4  2  1
+
+                         Mo   Tu   We  Th  Fr  Sa  Su
+        Weekdays:  124 = 64 + 32 + 16 + 8 + 4
+
+        Mo-Th Sun: 121 = 64 + 32 + 16 + 8 + 0 + 0 + 1
+        '''
         return re.match(
             r'W\d{3}/T\d{2}:\d{2}:\d{2}(A\d{2}:\d{2}\d{2})?',
             self.timestr
