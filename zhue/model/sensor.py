@@ -37,7 +37,7 @@ class Sensor(HueLLDevice):
         return self.battery is not None
 
 
-class SensorConfig(HueObject):
+class SensorConfig(HueJsonObject):
     @property
     def battery(self):
         return self._json.get('battery', None)
