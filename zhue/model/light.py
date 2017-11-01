@@ -11,5 +11,8 @@ class Light(LightDevice):
     def state(self):
         return LightDeviceState(self._json['state'])
 
+    def delete(self):
+        return self._bridge.delete_light(self.hue_id)
+
     def __str__(self):
         return '<Light: {}{}>'.format(self.name, ' (*)' if self.is_on else '')
