@@ -3,7 +3,12 @@
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
+
+import logging
+import re
+import requests
 from simplejson.decoder import JSONDecodeError
+
 from .api_response import (HueApiResponse, HueErrorResponse)
 from .config import BridgeConfig
 from .device import HueDevice
@@ -12,17 +17,11 @@ from .light import Light
 from .rule import Rule
 from .scene import Scene
 from .schedule import Schedule
-from .sensor import (LightLevelSensor, TemperatureSensor)
+from .sensor import (LightLevelSensor, TemperatureSensor, PresenceSensor)
 from .sensor import factory as sensorfactory
-import logging
-import re
-import requests
 
 
-logger = logging.getLogger(__name__)
-
-
-endpoint_regex = re.compile(r'/api/([^/]+)/([^/]+)/([^/]+)(?:/(.+))?')
+_LOGGER = logging.getLogger(__name__)
 
 
 class HueError(Exception):
@@ -37,14 +36,15 @@ class Bridge(object):
         self.__contruct_api_url()
 
     def from_address(self, address):
-        m = re.match(endpoint_regex, address)
-        assert m, 'Invalid address'
-        endpoint = m.group(2)
-        hue_id = m.group(3)
+        endpoint_regex = re.compile(r'/api/([^/]+)/([^/]+)/([^/]+)(?:/(.+))?')
+        match = re.match(endpoint_regex, address)
+        assert match, 'Invalid address'
+        endpoint = match.group(2)
+        hue_id = match.group(3)
         if endpoint == 'sensors':
             return self.sensor(hue_id=hue_id)
         elif endpoint == 'lamps':
-            return self.lamp(hue_id=hue_id)
+            return self.light(hue_id=hue_id)
         elif endpoint == 'groups':
             return self.group(hue_id=hue_id)
         elif endpoint == 'schedules':
@@ -67,7 +67,7 @@ class Bridge(object):
         )
         if self.username:
             self.API += '/{}'.format(self.username)
-        logger.info('Update API URL to: {}'.format(self.API))
+        _LOGGER.info('Update API URL to: {}'.format(self.API))
 
     def _request(self, url, method='GET', data=None):
         res = requests.request(url=url, method=method, json=data)
@@ -76,13 +76,13 @@ class Bridge(object):
             res.raise_for_status()
         try:
             jr = res.json()
-            logger.debug('JSON Response: {}'.format(jr))
+            _LOGGER.debug('JSON Response: {}'.format(jr))
             response = HueApiResponse.factory(jr)
             if type(response) is HueErrorResponse:
                 raise HueError(response.description)
             return response
         except JSONDecodeError:
-            logger.error(
+            _LOGGER.error(
                 'Failed to decode JSON from response: {}'.format(res.text)
             )
 
@@ -98,15 +98,15 @@ class Bridge(object):
         if not fast or not nupnp:
             upnp = Bridge.discover_upnp(username=username)
         else:
-            logger.info('Skip UPNP discovery')
+            _LOGGER.info('Skip UPNP discovery')
             upnp = []
         bridges = list(set(upnp + nupnp))
-        return bridges[0] if guess and len(bridges) > 0 else bridges
+        return bridges[0] if guess and bridges else bridges
 
     @staticmethod
     def discover_nupnp(username=None):
-        r = requests.get('https://www.meethue.com/api/nupnp')
-        return [Bridge(x['internalipaddress'], username) for x in r.json()]
+        res = requests.get('https://www.meethue.com/api/nupnp')
+        return [Bridge(x['internalipaddress'], username) for x in res.json()]
 
     @staticmethod
     def discover_upnp(username=None):
@@ -119,7 +119,7 @@ class Bridge(object):
         res = scan()
 
         for h in res:
-            logger.info('Check {}'.format(h))
+            _LOGGER.info('Check {}'.format(h))
             device_info = h.description.get('device', None)
             if device_info:
                 manufacturer = device_info.get('manufacturer', None)
@@ -129,11 +129,15 @@ class Bridge(object):
                     if url not in hue_bridges:
                         hue_bridges.append(url)
             else:
-                logger.error('Missing device info')
+                _LOGGER.error('Missing device info')
         return [Bridge.from_url(x, username) for x in hue_bridges]
 
     def delete_user(self, username):
         url = '{}/config/whitelist/{}'.format(self.API, username)
+        return self._request(method='DELETE', url=url)
+
+    def delete_light(self, hue_id):
+        url = '{}/lights/{}'.format(self.API, hue_id)
         return self._request(method='DELETE', url=url)
 
     def get_full_state(self):
@@ -231,7 +235,7 @@ class Bridge(object):
 
     @property
     def presence_sensors(self):
-        return self.__get_sensors_by_type(sensor.PresenceSensor)
+        return self.__get_sensors_by_type(PresenceSensor)
 
     def __get_hue_objects_by_type(self, device_type):
         if device_type == 'sensor':
@@ -248,8 +252,10 @@ class Bridge(object):
             return self.users
         elif device_type == 'device':
             return self.devices
+        elif device_type == 'rule':
+            return self.rules
         else:
-            logger.error('Unknown device type')
+            _LOGGER.error('Unknown device type')
 
     def __get_hue_object(self, device_type, name=None, hue_id=None,
                          exact=False):
@@ -288,6 +294,9 @@ class Bridge(object):
 
     def device(self, name=None, hue_id=None, exact=False):
         return self.__get_hue_object('device', name, hue_id, exact)
+
+    def rule(self, name=None, hue_id=None, exact=False):
+        return self.__get_hue_object('rule', name, hue_id, exact)
 
     # Hue object discovery
     def __find_new(self, hueobjecttype):
