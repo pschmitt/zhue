@@ -145,12 +145,12 @@ class PresenceSensor(Sensor):
         return self.config.battery
 
     def enable(self):
-        self._bridge._request(method='PUT', url=self.API + '/config',
-                              data={"on": True})
+        return self._bridge._request(
+            method='PUT', url=self.API + '/config', data={"on": True})
 
     def disable(self):
-        self._bridge._request(method='PUT', url=self.API + '/config',
-                              data={"on": False})
+        return self._bridge._request(
+            method='PUT', url=self.API + '/config', data={"on": False})
 
 
 class PresenceSensorConfig(SensorConfig):
