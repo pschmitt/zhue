@@ -168,6 +168,34 @@ class SwitchSensor(Sensor):
     def config(self):
         return SwitchSensorConfig(self._json['config'])
 
+    @property
+    def last_updated(self):
+        return self._json.get('state', {}).get('lastupdated')
+
+    @property
+    def button_event(self):
+        return self._json.get('state', {}).get('buttonevent')
+
+    @property
+    def friendly_button_event(self):
+        button_event = int(self.button_event)
+        button_names = {
+            1: 'on',
+            2: 'brightness_up',
+            3: 'brightness_down',
+            4: 'off'
+        }
+        button_click_types = {
+            0: 'short_pressed',
+            1: 'long',
+            2: 'short_released',
+            3: 'long_released'
+        }
+        name = int(button_event / 1000)
+        click_type = button_event - (name * 1000)
+        return (button_names.get(name),
+                button_click_types.get(click_type))
+
 
 class SwitchSensorConfig(SensorConfig):
     @property

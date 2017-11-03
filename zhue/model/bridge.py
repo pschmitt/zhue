@@ -17,7 +17,8 @@ from .light import Light
 from .rule import Rule
 from .scene import Scene
 from .schedule import Schedule
-from .sensor import (LightLevelSensor, TemperatureSensor, PresenceSensor)
+from .sensor import (LightLevelSensor, SwitchSensor,
+                     TemperatureSensor, PresenceSensor)
 from .sensor import factory as sensorfactory
 
 
@@ -207,7 +208,6 @@ class Bridge(object):
             r.append(Rule(self, i, v))
         return r
 
-
     def __regroup_sensors(self):
         d = {}
         for s in self.sensors:
@@ -237,9 +237,15 @@ class Bridge(object):
     def presence_sensors(self):
         return self.__get_sensors_by_type(PresenceSensor)
 
+    @property
+    def switches(self):
+        return self.__get_sensors_by_type(SwitchSensor)
+
     def __get_hue_objects_by_type(self, device_type):
         if device_type == 'sensor':
             return self.sensors
+        elif device_type == 'switch':
+            return self.switches
         elif device_type == 'light':
             return self.lights
         elif device_type == 'group':
@@ -282,6 +288,9 @@ class Bridge(object):
 
     def sensor(self, name=None, hue_id=None, exact=False):
         return self.__get_hue_object('sensor', name, hue_id, exact)
+
+    def switch(self, name=None, hue_id=None, exact=False):
+        return self.__get_hue_object('switch', name, hue_id, exact)
 
     def schedule(self, name=None, hue_id=None, exact=False):
         return self.__get_hue_object('schedule', name, hue_id, exact)
