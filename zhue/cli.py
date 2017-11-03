@@ -29,17 +29,23 @@ def parse_args():
     sensor_parser.add_argument('STATE', choices=ON_OFF_CHOICE, nargs='?')
     switch_parser = subparsers.add_parser('switch')
     switch_parser.add_argument('NAME')
+    switch_parser.add_argument('-w', '--wait', action='store_true',
+                               default=False)
     switch_parser.add_argument('-S', '--secrets-file',
                                required=False, type=argparse.FileType('r'),
                                help='Home Assistant secrets file')
-    switch_parser.add_argument('-w', '--wait', action='store_true',
-                               default=False)
     switch_parser.add_argument('-H', '--home-assistant',
                                required=False,
                                help='Home Assistant URL')
     switch_parser.add_argument('-P', '--home-assistant-password',
                                required=False,
                                help='Home Assistant Password')
+    temperature_parser = subparsers.add_parser('temperature')
+    temperature_parser.add_argument('NAME')
+    light_level_parser = subparsers.add_parser('light-level')
+    light_level_parser.add_argument('NAME')
+    motion_parser = subparsers.add_parser('motion')
+    motion_parser.add_argument('NAME')
     battery_parser = subparsers.add_parser('battery')
     battery_parser.add_argument('NAME')
     return parser.parse_args()
@@ -113,8 +119,17 @@ def main():
                 print('Name:', switch.name, '\nButton:', button,
                       '\nEvent:', click_type)
     elif args.action == 'battery':
-        bat_device = bridge.device(args.NAME)
-        print(bat_device.battery)
+        device = bridge.device(args.NAME)
+        print(device.battery)
+    elif args.action == 'temperature':
+        device = bridge.device(args.NAME)
+        print(device.temperature)
+    elif args.action == 'light-level':
+        device = bridge.device(args.NAME)
+        print(device.light_level)
+    elif args.action == 'motion':
+        device = bridge.device(args.NAME)
+        print(device.presence)
 
 
 if __name__ == '__main__':
