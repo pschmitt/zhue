@@ -11,6 +11,9 @@ from yaml import load as yaml_load
 import requests
 
 
+_LOGGER = logging.getLogger(__name__)
+
+
 def parse_args():
     ON_OFF_CHOICE = ['on', 'off']
     parser = argparse.ArgumentParser()
@@ -23,7 +26,7 @@ def parse_args():
     light_parser = subparsers.add_parser('light')
     light_parser.add_argument('NAME')
     light_parser.add_argument('STATE', choices=ON_OFF_CHOICE)
-    sensors_parser = subparsers.add_parser('sensors')
+    subparsers.add_parser('sensors')
     sensor_parser = subparsers.add_parser('sensor')
     sensor_parser.add_argument('NAME')
     sensor_parser.add_argument('STATE', choices=ON_OFF_CHOICE, nargs='?')
@@ -63,14 +66,18 @@ def hass_event(url, api_key, switches, event_name='hue_dimmer_switch_pressed'):
                 print('Name:', switch.name, '\nButton:', button,
                       '\nEvent:', click_type, '\n')
                 if url:
-                    res = requests.post(
-                        '{}/api/events/{}'.format(url, event_name),
-                        headers={'X-HA-Access': api_key},
-                        json={'button_name': button,
-                              'click_type': click_type}
-                    )
-                    res.raise_for_status()
-                    print(res.json(), '\n')
+                    try:
+                        res = requests.post(
+                            '{}/api/events/{}'.format(url, event_name),
+                            headers={'X-HA-Access': api_key},
+                            json={'switch_name': switch.name,
+                                  'button_name': button,
+                                  'click_type': click_type}
+                        )
+                        res.raise_for_status()
+                        print(res.json(), '\n')
+                    except Exception as exc:
+                        _LOGGER.error('Failed to post HASS event: %s', exc)
                 last_updated[switch.name] = switch.last_updated
             time.sleep(1)
 
