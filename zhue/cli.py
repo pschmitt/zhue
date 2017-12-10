@@ -34,6 +34,8 @@ def parse_args():
     switch_parser.add_argument('NAME')
     switch_parser.add_argument('-w', '--wait', action='store_true',
                                default=False)
+    switch_parser.add_argument('-i', '--ignore-pressed-events',
+                               action='store_true', default=False)
     switch_parser.add_argument('-S', '--secrets-file',
                                required=False, type=argparse.FileType('r'),
                                help='Home Assistant secrets file')
@@ -54,7 +56,8 @@ def parse_args():
     return parser.parse_args()
 
 
-def hass_event(url, api_key, switches, event_name='hue_dimmer_switch_pressed'):
+def hass_event(url, api_key, switches, event_name='hue_dimmer_switch_pressed',
+               ignore_pressed_events=False):
     last_updated = {}
     while True:
         for switch in switches:
@@ -62,7 +65,9 @@ def hass_event(url, api_key, switches, event_name='hue_dimmer_switch_pressed'):
             switch.update()
             if switch.last_updated != last_updated[switch.name]:
                 button, click_type = switch.friendly_button_event
-                button, click_type = switch.friendly_button_event
+                if ignore_pressed_events and click_type.endswith('_pressed'):
+                    _LOGGER.warning("Event ignored")
+                    continue
                 print('Name:', switch.name, '\nButton:', button,
                       '\nEvent:', click_type, '\n')
                 if url:
@@ -120,7 +125,8 @@ def main():
             else:
                 hass_url = args.home_assistant
                 hass_key = args.home_assistant_password
-            hass_event(hass_url, hass_key, switches)
+            hass_event(hass_url, hass_key, switches,
+                       ignore_pressed_events=args.ignore_pressed_events)
         else:
             for switch in switches:
                 button, click_type = switch.friendly_button_event
