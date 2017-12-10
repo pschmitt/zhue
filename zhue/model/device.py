@@ -75,4 +75,3 @@ class HueMotionDetectorDevice(HueMultiSensorDevice):
     @property
     def hue_id(self):
         return self.sensors[0].hue_id
-

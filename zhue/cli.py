@@ -6,7 +6,7 @@ import argparse
 import logging
 import time
 
-from model.bridge import Bridge
+from zhue.model.bridge import Bridge
 from yaml import load as yaml_load
 import requests
 
@@ -69,6 +69,7 @@ def hass_event(url, api_key, switches, event_name='hue_dimmer_switch_pressed'):
                         json={'button_name': button,
                               'click_type': click_type}
                     )
+                    res.raise_for_status()
                     print(res.json(), '\n')
                 last_updated[switch.name] = switch.last_updated
             time.sleep(1)

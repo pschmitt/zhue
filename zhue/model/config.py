@@ -61,7 +61,7 @@ class BridgeConfig(HueBaseObject):
     @property
     def users(self):
         u = []
-        for k, v in self._json['whitelist'].iteritems():
+        for k, v in self._json['whitelist'].items():
             u.append(User(username=k, json=v))
         return u
 
