@@ -3,7 +3,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='zhue',
-    version='0.9.0',
+    version='0.9.1',
     license='GPL3',
     description='Python SDK for Philips Hue devices',
     long_description=open('README.rst').read(),
@@ -11,5 +11,6 @@ setup(
     author_email='philipp@schmitt.co',
     url='https://github.com/pschmitt/zhue',
     packages=find_packages(),
-    install_requires=['requests', 'netdisco', 'simplejson']
+    install_requires=['requests', 'netdisco', 'simplejson'],
+    entry_points={'console_scripts': ['zhue=zhue.cli:main']}
 )
