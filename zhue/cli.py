@@ -60,18 +60,19 @@ def hass_event(url, api_key, switches, event_name='hue_dimmer_switch_pressed',
                ignore_pressed_events=False):
     last_updated = {}
     while True:
-        for switch in switches:
-            last_updated[switch.name] = switch.last_updated
-            switch.update()
-            if switch.last_updated != last_updated[switch.name]:
-                button, click_type = switch.friendly_button_event
-                if ignore_pressed_events and click_type.endswith('_pressed'):
-                    _LOGGER.warning("Event ignored")
-                    continue
-                print('Name:', switch.name, '\nButton:', button,
-                      '\nEvent:', click_type, '\n')
-                if url:
-                    try:
+        try:
+            for switch in switches:
+                last_updated[switch.name] = switch.last_updated
+                switch.update()
+                if switch.last_updated != last_updated[switch.name]:
+                    button, click_type = switch.friendly_button_event
+                    if (ignore_pressed_events and
+                            click_type.endswith('_pressed')):
+                        _LOGGER.warning("Event ignored")
+                        continue
+                    _LOGGER.info('Name: %s - Button: %s- Event: %s',
+                                 switch.name, button, click_type)
+                    if url:
                         res = requests.post(
                             '{}/api/events/{}'.format(url, event_name),
                             headers={'X-HA-Access': api_key},
@@ -80,11 +81,11 @@ def hass_event(url, api_key, switches, event_name='hue_dimmer_switch_pressed',
                                   'click_type': click_type}
                         )
                         res.raise_for_status()
-                        print(res.json(), '\n')
-                    except Exception as exc:
-                        _LOGGER.error('Failed to post HASS event: %s', exc)
-                last_updated[switch.name] = switch.last_updated
-            time.sleep(1)
+                        _LOGGER.info('Request response: %s', res.json())
+                    last_updated[switch.name] = switch.last_updated
+                time.sleep(1)
+        except Exception as exc:
+            _LOGGER.error("Unhandled exception caught: %s", exc)
 
 
 def main():
